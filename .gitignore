@@ -14,7 +14,7 @@ tests/
 /.storage/Export/
 /.storage/customer/
 /.storage/ExportSaleProduct/
-composer.lock
+#composer.lock
 /.public/uploads/
 nohup.out
 db
