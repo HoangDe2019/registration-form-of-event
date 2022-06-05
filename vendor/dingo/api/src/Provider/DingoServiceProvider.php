@@ -188,4 +188,5 @@ class DingoServiceProvider extends ServiceProvider
 
         $this->commands([\Dingo\Api\Console\Command\Docs::class]);
     }
+
 }
