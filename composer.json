@@ -43,7 +43,8 @@
     "tymon/jwt-auth": "1.0.*",
     "vlucas/phpdotenv": "^5.2",
     "wisembly/elephant.io": "^3.3",
-    "zircote/swagger-php": "^3.2"
+    "zircote/swagger-php": "^3.2",
+    "ext-soap": "*"
   },
   "require-dev": {
     "fzaninotto/faker": "~1.4",
@@ -54,6 +55,7 @@
   "autoload": {
     "classmap": [
       "database/seeds",
+      "soapclient",
       "database/factories"
     ],
     "psr-4": {
