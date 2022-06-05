@@ -1,0 +1,44 @@
+{
+    "name": "matthewbdaly/laravel-sms",
+    "description": "A Laravel and Lumen integration for matthewbdaly/sms-client to enable sending SMS messages",
+    "type": "library",
+    "keywords": ["sms","laravel","lumen"],
+    "require": {
+        "matthewbdaly/sms-client": "^1.0"
+    },
+    "require-dev": {
+        "orchestra/testbench": "3.5",
+        "phpunit/phpunit": "^6.3",
+        "mockery/mockery": "^0.9.9",
+        "squizlabs/php_codesniffer": "^3.1",
+        "aws/aws-sdk-php": "3.*",
+        "psy/psysh": "^0.8.11"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Matthew Daly",
+            "email": "matthewbdaly@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Matthewbdaly\\LaravelSMS\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Matthewbdaly\\LaravelSMS\\LaravelSMSProvider"
+            ],
+            "aliases": {
+                "SMS": "Matthewbdaly\\LaravelSMS\\Facade"
+            }
+        }
+    }
+}
