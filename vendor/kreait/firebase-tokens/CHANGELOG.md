@@ -1,5 +1,40 @@
 # CHANGELOG
 
+## 1.16.1 - 2021-10-03
+
+Update [lcobucci/jwt](https://github.com/lcobucci/jwt) version constraint to `^3.4.6|^4.0.4|^4.1.5` to prevent misuse
+of the `LocalFileReference` key.
+
+More info: [GHSA-7322-jrq4-x5hf](https://github.com/lcobucci/jwt/security/advisories/GHSA-7322-jrq4-x5hf)
+
+## 1.16.0 - 2021-07-15
+
+- Un-deprecated `Firebase\Auth\Token\Domain\Generator`, `Firebase\Auth\Token\Domain\Verifier` and
+  `\Firebase\Auth\Token\Domain\KeyStore`
+- Dropped support for unsupported PHP versions. Starting with this release, supported versions 
+  are PHP ^7.4 and PHP ^8.0.
+- Allowed usage of `psr/cache` `^2.0|^3.0`
+
+## 1.15.0 - 2021-04-19
+
+- Use fallback cache duration (defaults to 1 hour) when fetching public keys from Google and
+  the response doesn't contain cache headers.
+- Add additional URL to fetch Google's public keys. 
+
+## 1.14.0 - 2020-12-09
+
+- Drop the `V3` suffix from handlers using `lcobucci/jwt`
+- Limit support to PHP 8.0.*
+
+## 1.13.0 - 2020-11-29
+
+- Added support for PHP 8.0
+
+## 1.12.0 - 2020-11-27
+
+- Added Tenant Awareness
+- Fixed usage of deprecated functionality from `lcobucci/jwt`
+
 ## 1.11.0 - 2020-10-04
 
 - Updated dev-dependency on `symfony/cache` to address [CVE-2019-10912](https://github.com/advisories/GHSA-w2fr-65vp-mxw3)

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Firebase\Auth\Token\Domain;
 
 use Firebase\Auth\Token\Exception\ExpiredToken;
@@ -10,10 +12,6 @@ use Firebase\Auth\Token\Exception\UnknownKey;
 use InvalidArgumentException;
 use Lcobucci\JWT\Token;
 
-/**
- * @deprecated 1.9.0
- * @see \Kreait\Firebase\JWT\IdTokenVerifier
- */
 interface Verifier
 {
     /**

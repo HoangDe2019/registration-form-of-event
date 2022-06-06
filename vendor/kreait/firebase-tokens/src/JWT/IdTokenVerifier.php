@@ -6,8 +6,11 @@ namespace Kreait\Firebase\JWT;
 
 use InvalidArgumentException;
 use Kreait\Clock\SystemClock;
-use Kreait\Firebase\JWT\Action\FetchGooglePublicKeys;
+use Kreait\Firebase\JWT\Action\FetchGooglePublicKeys\WithHandlerDiscovery;
+use Kreait\Firebase\JWT\Action\FetchGooglePublicKeys\WithPsr16SimpleCache;
+use Kreait\Firebase\JWT\Action\FetchGooglePublicKeys\WithPsr6Cache;
 use Kreait\Firebase\JWT\Action\VerifyIdToken;
+use Kreait\Firebase\JWT\Action\VerifyIdToken\Handler;
 use Kreait\Firebase\JWT\Cache\InMemoryCache;
 use Kreait\Firebase\JWT\Contract\Token;
 use Kreait\Firebase\JWT\Error\IdTokenVerificationFailed;
@@ -16,10 +19,11 @@ use Psr\SimpleCache\CacheInterface;
 
 final class IdTokenVerifier
 {
-    /** @var VerifyIdToken\Handler */
-    private $handler;
+    private Handler $handler;
 
-    public function __construct(VerifyIdToken\Handler $handler)
+    private ?string $expectedTenantId = null;
+
+    public function __construct(Handler $handler)
     {
         $this->handler = $handler;
     }
@@ -29,18 +33,17 @@ final class IdTokenVerifier
         return self::createWithProjectIdAndCache($projectId, InMemoryCache::createEmpty());
     }
 
+    /**
+     * @param CacheInterface|CacheItemPoolInterface $cache
+     */
     public static function createWithProjectIdAndCache(string $projectId, $cache): self
     {
         $clock = new SystemClock();
-        $keyHandler = new FetchGooglePublicKeys\WithHandlerDiscovery($clock);
+        $keyHandler = new WithHandlerDiscovery($clock);
 
-        if ($cache instanceof CacheInterface) {
-            $keyHandler = new FetchGooglePublicKeys\WithPsr16SimpleCache($keyHandler, $cache, $clock);
-        } elseif ($cache instanceof CacheItemPoolInterface) {
-            $keyHandler = new FetchGooglePublicKeys\WithPsr6Cache($keyHandler, $cache, $clock);
-        } else {
-            throw new InvalidArgumentException(sprintf('The cache must implement %s or %s', CacheInterface::class, CacheItemPoolInterface::class));
-        }
+        $keyHandler = $cache instanceof CacheInterface
+            ? new WithPsr16SimpleCache($keyHandler, $cache, $clock)
+            : new WithPsr6Cache($keyHandler, $cache, $clock);
 
         $keys = new GooglePublicKeys($keyHandler, $clock);
         $handler = new VerifyIdToken\WithHandlerDiscovery($projectId, $keys, $clock);
@@ -48,8 +51,20 @@ final class IdTokenVerifier
         return new self($handler);
     }
 
+    public function withExpectedTenantId(string $tenantId): self
+    {
+        $generator = clone $this;
+        $generator->expectedTenantId = $tenantId;
+
+        return $generator;
+    }
+
     public function execute(VerifyIdToken $action): Token
     {
+        if ($this->expectedTenantId) {
+            $action = $action->withExpectedTenantId($this->expectedTenantId);
+        }
+
         return $this->handler->handle($action);
     }
 

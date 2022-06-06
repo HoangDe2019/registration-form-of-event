@@ -10,8 +10,8 @@ Achieve more with the [Firebase Admin SDK](https://github.com/kreait/firebase-ph
 [![Supported PHP version](https://img.shields.io/packagist/php-v/kreait/firebase-tokens.svg)]()
 [![Monthly Downloads](https://img.shields.io/packagist/dm/kreait/firebase-tokens.svg)](https://packagist.org/packages/kreait/firebase-tokens/stats)
 [![Total Downloads](https://img.shields.io/packagist/dt/kreait/firebase-tokens.svg)](https://packagist.org/packages/kreait/firebase-tokens/stats)
-[![Build Status](https://travis-ci.org/kreait/firebase-tokens-php.svg)](https://travis-ci.org/kreait/firebase-tokens-php)
-[![Discord](https://img.shields.io/discord/523866370778333184.svg?color=7289da&logo=discord)](https://discord.gg/nbgVfty)
+[![Tests](https://github.com/kreait/firebase-tokens-php/workflows/Tests/badge.svg)](https://github.com/kreait/firebase-tokens-php/actions)
+[![Discord](https://img.shields.io/discord/807679292573220925.svg?color=7289da&logo=discord)](https://discord.gg/Yacm7unBsr)
 [![Sponsor](https://img.shields.io/static/v1?logo=GitHub&label=Sponsor&message=%E2%9D%A4&color=ff69b4)](https://github.com/sponsors/jeromegamez)
 
 - [Installation](#installation)
@@ -19,6 +19,7 @@ Achieve more with the [Firebase Admin SDK](https://github.com/kreait/firebase-ph
   - [Create a custom token](#create-a-custom-token)
   - [Verify an ID token](#verify-an-id-token)
   - [Tokens](#tokens)
+  - [Tenant Awareness](#tenant-awareness) 
 - [Advanced Usage](#advanced-usage)
   - [Cache results from the Google Secure Token Store](#cache-results-from-the-google-secure-token-store)
 
@@ -139,6 +140,33 @@ echo $token->toString();
 $tokenString = (string) $token; // string
 // eyJhb...
 ```
+
+### Tenant Awareness
+
+You can create custom tokens that are scoped to a given tenant:
+
+```php
+<?php
+
+use Kreait\Firebase\JWT\CustomTokenGenerator;
+
+$generator = CustomTokenGenerator::withClientEmailAndPrivateKey('...', '...');
+
+$tenantAwareGenerator = $generator->withTenantId('my-tenant-id');
+```
+
+Similarly, you can verify that ID tokens were issued in the scope of a given tenant:
+
+```php
+<?php
+
+use Kreait\Firebase\JWT\IdTokenVerifier;
+
+$verifier = IdTokenVerifier::createWithProjectId('my-project-id');
+
+$tenantAwareVerifier = $verifier->withExpectedTenantId('my-tenant-id');
+```
+
 
 ## Advanced usage
 

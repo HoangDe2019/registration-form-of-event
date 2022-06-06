@@ -16,15 +16,18 @@ use Throwable;
  */
 final class Duration
 {
-    const NONE = 'PT0S';
+    public const NONE = 'PT0S';
 
-    /** @var DateInterval */
-    private $value;
+    private DateInterval $value;
 
-    private function __construct()
+    private function __construct(DateInterval $value)
     {
+        $this->value = $value;
     }
 
+    /**
+     * @param self|DateInterval|int|string $value
+     */
     public static function make($value): self
     {
         if ($value instanceof self) {
@@ -35,25 +38,29 @@ final class Duration
             return self::fromDateInterval($value);
         }
 
-        if (is_int($value)) {
+        if (\is_int($value)) {
             return self::inSeconds($value);
         }
 
-        if (is_string($value) && strpos($value, 'P') === 0) {
+        if (\mb_strpos($value, 'P') === 0) {
             return self::fromDateIntervalSpec($value);
         }
 
-        if (is_string($value)) {
-            try {
-                $interval = DateInterval::createFromDateString($value);
-            } catch (Throwable $e) {
-                throw new InvalidArgumentException("Unable to determine a duration from the value '{$value}'");
-            }
-
-            return self::fromDateInterval($interval);
+        try {
+            $interval = DateInterval::createFromDateString($value);
+        } catch (Throwable $e) {
+            throw new InvalidArgumentException("Unable to determine a duration from '{$value}'");
         }
 
-        throw new InvalidArgumentException('Unable to determine a duration from the given value');
+        $duration = self::fromDateInterval($interval);
+
+        // If the string doesn't contain a zero, but the result equals to zero
+        // the value must be invalid.
+        if (\mb_strpos($value, '0') === false && $duration->equals(self::none())) {
+            throw new InvalidArgumentException("Unable to determine a duration from '{$value}'");
+        }
+
+        return $duration;
     }
 
     /**
@@ -91,10 +98,7 @@ final class Duration
             throw new InvalidArgumentException('A duration can not be negative');
         }
 
-        $ttl = new self();
-        $ttl->value = $interval;
-
-        return $ttl;
+        return new self($interval);
     }
 
     public static function none(): self
@@ -107,21 +111,33 @@ final class Duration
         return $this->value;
     }
 
+    /**
+     * @param self|DateInterval|int|string $other
+     */
     public function isLargerThan($other): bool
     {
         return 1 === $this->compareTo($other);
     }
 
+    /**
+     * @param self|DateInterval|int|string $other
+     */
     public function equals($other): bool
     {
         return 0 === $this->compareTo($other);
     }
 
+    /**
+     * @param self|DateInterval|int|string $other
+     */
     public function isSmallerThan($other): bool
     {
         return -1 === $this->compareTo($other);
     }
 
+    /**
+     * @param self|DateInterval|int|string $other
+     */
     public function compareTo($other): int
     {
         $other = self::make($other);
@@ -143,7 +159,7 @@ final class Duration
 
     private static function now(): DateTimeImmutable
     {
-        return new DateTimeImmutable('@'.time());
+        return new DateTimeImmutable('@'.\time());
     }
 
     private static function normalizeInterval(DateInterval $value): DateInterval
@@ -166,8 +182,8 @@ final class Duration
         $spec .= 0 !== $value->i ? $value->i.'M' : '';
         $spec .= 0 !== $value->s ? $value->s.'S' : '';
 
-        if ('T' === substr($spec, -1)) {
-            $spec = substr($spec, 0, -1);
+        if ('T' === \mb_substr($spec, -1)) {
+            $spec = \mb_substr($spec, 0, -1);
         }
 
         if ('P' === $spec) {

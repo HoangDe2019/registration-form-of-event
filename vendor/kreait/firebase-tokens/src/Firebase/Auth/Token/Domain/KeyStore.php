@@ -1,16 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Firebase\Auth\Token\Domain;
 
-/**
- * @deprecated 1.9.0
- */
+use OutOfBoundsException;
+
 interface KeyStore
 {
     /**
      * @param string $keyId
      *
-     * @throws \OutOfBoundsException
+     * @throws OutOfBoundsException
      *
      * @return string
      */

@@ -10,12 +10,11 @@ use Kreait\Firebase\JWT\Action\VerifyIdToken;
 use Kreait\Firebase\JWT\Contract\Keys;
 use Kreait\Firebase\JWT\Contract\Token;
 use Kreait\Firebase\JWT\Error\DiscoveryFailed;
-use Lcobucci\JWT\Builder;
+use Lcobucci\JWT\Configuration;
 
 final class WithHandlerDiscovery implements Handler
 {
-    /** @var Handler */
-    private $handler;
+    private Handler $handler;
 
     public function __construct(string $projectId, Keys $keys, Clock $clock)
     {
@@ -29,12 +28,12 @@ final class WithHandlerDiscovery implements Handler
 
     private static function discoverHandler(string $projectId, Keys $keys, Clock $clock): Handler
     {
-        if (class_exists(JWT::class)) {
-            return new VerifyIdToken\WithFirebaseJWT($projectId, $keys, $clock);
+        if (\class_exists(JWT::class)) {
+            return new WithFirebaseJWT($projectId, $keys, $clock);
         }
 
-        if (class_exists(Builder::class)) {
-            return new VerifyIdToken\WithLcobucciV3JWT($projectId, $keys, $clock);
+        if (\class_exists(Configuration::class)) {
+            return new WithLcobucciJWT($projectId, $keys, $clock);
         }
 
         throw DiscoveryFailed::noJWTLibraryFound();
